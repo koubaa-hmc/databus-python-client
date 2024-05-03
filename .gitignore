@@ -159,6 +159,10 @@ cython_debug/
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
+.idea/**/*.xml
+.idea/**/*.iml
+.idea/**/.gitignore
+
 .idea/**/dictionaries
 .idea/**/shelf
 
