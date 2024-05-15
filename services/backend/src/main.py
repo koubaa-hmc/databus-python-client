@@ -15,3 +15,8 @@ app.add_middleware(
 @app.get("/")
 def home():
     return "Hello, World!"
+
+
+@app.get("/manifest")
+def get_artifacts():
+    return "Here are some artifacts"
