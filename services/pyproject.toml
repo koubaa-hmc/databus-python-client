@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "regimo"
+name = "backend_regimo"
 version = "0.1.0"
 description = "This is the backend for Regimo. Regimo is a tool to register data on a databus."
 authors = ["Anis Koubaa <mohamed.koubaa@kit.edu>"]
@@ -8,9 +8,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fastapi = "^0.111.0"
-uvicorn = "^0.29.0"
-
+fastapi = "^0.100.0"
+uvicorn = "^0.24.0"
 
 [build-system]
 requires = ["poetry-core"]
