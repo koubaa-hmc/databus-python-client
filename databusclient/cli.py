@@ -24,7 +24,7 @@ def deploy(
         "download URL and CV the "
         "key=value pairs (_ separated) content variants of a distribution. filext and compression are optional "
         "and if left out inferred from the path. If the sha256sum:contentlength part is left out it will be "
-        "calcuted by downloading the file.",
+        "calculated by downloading the file.",
     ),
 ):
     typer.echo(version_id)
@@ -36,8 +36,9 @@ def deploy(
 
 @app.command()
 def download(
-    localDir: str = typer.Option(..., help="local databus folder"),
+    local_dir: str = typer.Option(..., help="local databus folder"),
     databus: str = typer.Option(..., help="databus URL"),
-    databusuris: List[str] = typer.Argument(...,help="any kind of these: databus identifier, databus collection identifier, query file")
+    databus_uris: List[str] = typer.Argument(..., help="any kind of these: databus identifier, databus "
+                                                       "collection identifier, query file")
 ):
-    client.download(localDir=localDir,endpoint=databus,databusURIs=databusuris)
+    client.download(local_dir=local_dir, endpoint=databus, databus_uris=databus_uris)

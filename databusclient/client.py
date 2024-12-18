@@ -180,9 +180,11 @@ def create_distribution(
 ) -> str:
     """Creates the identifier-string for a distribution used as downloadURLs in the createDataset function.
     url: is the URL of the dataset
-    cvs: dict of content variants identifying a certain distribution (needs to be unique for each distribution in the dataset)
+    cvs: dict of content variants identifying a certain distribution (needs to be unique for each distribution in the
+                dataset)
     file_format: identifier for the file format (e.g. json). If set to None client tries to infer it from the path
-    compression: identifier for the compression format (e.g. gzip). If set to None client tries to infer it from the path
+    compression: identifier for the compression format (e.g. gzip). If set to None client tries to infer it from the
+                path
     sha256_length_tuple: sha256sum and content_length of the file in the form of Tuple[shasum, length].
     If left out file will be downloaded extra and calculated.
     """
@@ -219,14 +221,16 @@ def create_dataset(
     group_description: str = None,
 ) -> Dict[str, Union[List[Dict[str, Union[bool, str, int, float, List]]], str]]:
     """
-    Creates a Databus Dataset as a python dict from distributions and submitted metadata. WARNING: If file stats (sha256sum, content length)
-    were not submitted, the client loads the files and calculates them. This can potentially take a lot of time, depending on the file size.
+    Creates a Databus Dataset as a python dict from distributions and submitted metadata. WARNING: If file stats
+    (sha256sum, content length) were not submitted, the client loads the files and calculates them. This can
+    potentially take a lot of time, depending on the file size.
     The result can be transformed to a JSON-LD by calling json.dumps(dataset).
 
     Parameters
     ----------
     version_id: str
-        The version ID representing the Dataset. Needs to be in the form of $DATABUS_BASE/$ACCOUNT/$GROUP/$ARTIFACT/$VERSION
+        The version ID representing the Dataset. Needs to be in the form of
+        $DATABUS_BASE/$ACCOUNT/$GROUP/$ARTIFACT/$VERSION
     title: str
         The title text of the dataset
     abstract: str
@@ -252,7 +256,7 @@ def create_dataset(
     _versionId = str(version_id).strip("/")
     _, account_name, group_name, artifact_name, version = _versionId.rsplit("/", 4)
 
-    # could be build from stuff above,
+    # could be built from stuff above,
     # was not sure if there are edge cases BASE=http://databus.example.org/"base"/...
     group_id = _versionId.rsplit("/", 2)[0]
 
@@ -359,15 +363,16 @@ def deploy(
     Parameters
     ----------
     dataid: Dict[str, Union[List[Dict[str, Union[bool, str, int, float, List]]], str]]
-        The dataid represented as a python dict. Preferably created by the creaateDataset function
+        The dataid represented as a python dict. Preferably created by the create Dataset function
     api_key: str
         the API key of the user noted in the Dataset identifier
     verify_parts: bool
-        flag of the publish POST request, prevents the databus from checking shasum and content length (is already handled by the client, reduces load on the Databus). Default is False
+        flag of the publish POST request, prevents the databus from checking shasum and content length (is already
+        handled by the client, reduces load on the Databus). Default is False
     log_level: DeployLogLevel
-        log level of the deploy output
+        log level of the deployment output
     debug: bool
-        controls whether output shold be printed to the console (stdout)
+        controls whether output should be printed to the console (stdout)
     """
 
     headers = {"X-API-KEY": f"{api_key}", "Content-Type": "application/json"}
@@ -401,14 +406,14 @@ def __download_file__(url, filename):
     - filename: the local file path where the file should be saved
     """
 
-    print("download "+url)    
-    os.makedirs(os.path.dirname(filename), exist_ok=True) # Create the necessary directories
+    print("download "+url)
+    os.makedirs(os.path.dirname(filename), exist_ok=True)  # Create the necessary directories
     response = requests.get(url, stream=True)
-    total_size_in_bytes= int(response.headers.get('content-length', 0))
-    block_size = 1024 # 1 Kibibyte
+    total_size_in_bytes = int(response.headers.get('content-length', 0))
+    block_size = 1024  # 1 Kibibyte
 
     progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
-    with open(filename, 'wb') as file: 
+    with open(filename, 'wb') as file:
         for data in response.iter_content(block_size):
             progress_bar.update(len(data))
             file.write(data)
@@ -417,7 +422,7 @@ def __download_file__(url, filename):
         print("ERROR, something went wrong")
 
 
-def __query_sparql__(endpoint_url, query)-> dict:
+def __query_sparql__(endpoint_url, query) -> dict:
     """
     Query a SPARQL endpoint and return results in JSON format.
 
@@ -437,7 +442,7 @@ def __query_sparql__(endpoint_url, query)-> dict:
 
 
 def __handle__databus_file_query__(endpoint_url, query) -> List[str]:
-    result_dict = __query_sparql__(endpoint_url,query)
+    result_dict = __query_sparql__(endpoint_url, query)
     for binding in result_dict['results']['bindings']:
         if len(binding.keys()) > 1:
             print("Error multiple bindings in query response")
@@ -451,41 +456,41 @@ def wsha256(raw: str):
     return sha256(raw.encode('utf-8')).hexdigest()
 
 
-def __handle_databus_collection__(endpoint, uri: str)-> str:
+def __handle_databus_collection__(endpoint, uri: str) -> str:
     headers = {"Accept": "text/sparql"}
     return requests.get(uri, headers=headers).text
 
 
-def __download_list__(urls: List[str], localDir: str):
+def __download_list__(urls: List[str], local_dir: str):
     for url in urls:
-        __download_file__(url=url,filename=localDir+"/"+wsha256(url))
+        __download_file__(url=url, filename=local_dir+"/"+wsha256(url))
 
 
 def download(
-    localDir: str,
+    local_dir: str,
     endpoint: str,
-    databusURIs: List[str]
+    databus_uris: List[str]
 ) -> None:
     """
     Download datasets to local storage from databus registry
     ------
     localDir: the local directory
-    databusURIs: identifiers to access databus registered datasets
+    databus_uris: identifiers to access databus registered datasets
     """
-    for databusURI in databusURIs:
+    for databus_uri in databus_uris:
         # dataID or databus collection
-        if databusURI.startswith("http://") or databusURI.startswith("https://"):
+        if databus_uri.startswith("http://") or databus_uri.startswith("https://"):
             # databus collection
-            if "/collections/" in databusURI: #TODO "in" is not safe! there could be an artifact named collections, need to check for the correct part position in the URI
-                query = __handle_databus_collection__(endpoint,databusURI)
+            if "/collections/" in databus_uri:  # TODO "in" is not safe! there could be an artifact named collections, need to check for the correct part position in the URI
+                query = __handle_databus_collection__(endpoint, databus_uri)
                 res = __handle__databus_file_query__(endpoint, query)
             else:
-                print("dataId not supported yet") #TODO add support for other DatabusIds here (artifact, group, etc.)
+                print("dataId not supported yet")  # TODO add support for other DatabusIds here (artifact, group, etc.)
         # query in local file
-        elif databusURI.startswith("file://"):
+        elif databus_uri.startswith("file://"):
             print("query in file not supported yet")
         # query as argument
         else:
-            print("QUERY {}", databusURI.replace("\n"," "))
-            res = __handle__databus_file_query__(endpoint,databusURI)
-            __download_list__(res,localDir)
+            print("QUERY {}", databus_uri.replace("\n", " "))
+            res = __handle__databus_file_query__(endpoint, databus_uri)
+            __download_list__(res, local_dir)
