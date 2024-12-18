@@ -461,6 +461,12 @@ def __handle_databus_collection__(endpoint, uri: str) -> str:
     return requests.get(uri, headers=headers).text
 
 
+def __handle_databus_artefact__(endpoint, uri: str) -> str:
+    headers = {"Accept": "application/ld+json"}
+    resp = requests.get(uri, headers=headers).text
+    return resp
+
+
 def __download_list__(urls: List[str], local_dir: str):
     for url in urls:
         __download_file__(url=url, filename=local_dir+"/"+wsha256(url))
@@ -474,7 +480,7 @@ def download(
     """
     Download datasets to local storage from databus registry
     ------
-    localDir: the local directory
+    local_dir: the local directory
     databus_uris: identifiers to access databus registered datasets
     """
     for databus_uri in databus_uris:
@@ -483,14 +489,15 @@ def download(
             # databus collection
             if "/collections/" in databus_uri:  # TODO "in" is not safe! there could be an artifact named collections, need to check for the correct part position in the URI
                 query = __handle_databus_collection__(endpoint, databus_uri)
-                res = __handle__databus_file_query__(endpoint, query)
+                response = __handle__databus_file_query__(endpoint, query)
             else:
-                print("dataId not supported yet")  # TODO add support for other DatabusIds here (artifact, group, etc.)
+                response = __handle_databus_artefact__(endpoint, databus_uri)
+                # print("dataId not supported yet")  # TODO add support for other DatabusIds here (artifact, group, etc.)
         # query in local file
         elif databus_uri.startswith("file://"):
             print("query in file not supported yet")
         # query as argument
         else:
             print("QUERY {}", databus_uri.replace("\n", " "))
-            res = __handle__databus_file_query__(endpoint, databus_uri)
+            response = __handle__databus_file_query__(endpoint, databus_uri)
             __download_list__(res, local_dir)

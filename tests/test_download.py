@@ -9,6 +9,7 @@ SELECT ?x WHERE {
 } LIMIT 10
 """
 TEST_COLLECTION = "https://databus.openenergyplatform.org/koubaa-hmc/collections/sandbox"
+TEST_ARTEFACT = "https://databus.openenergyplatform.org/koubaa-hmc/active_photovoltaic/01-2022"
 
 
 def test_with_query():
@@ -17,3 +18,7 @@ def test_with_query():
 
 def test_with_collection():
     cl.download("tmp", DEFAULT_ENDPOINT, [TEST_COLLECTION])
+
+
+def test_with_artefact():
+    cl.download("tmp", DEFAULT_ENDPOINT, [TEST_ARTEFACT])

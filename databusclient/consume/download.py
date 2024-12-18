@@ -1,4 +1,5 @@
 # All kind of download functionalities for Databus ###
 
-class Downloder:
+
+class Downloader:
     pass
